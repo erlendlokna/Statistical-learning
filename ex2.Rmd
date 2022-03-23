@@ -1,21 +1,20 @@
 ---
 subtitle: "TMA4268 Statistical Learning V2022"
-title: "Compulsory exercise 1: Group XYZ (add your group number here)"
-author: "NN1, NN2 and NN3 (full names of all group members)"
+title: "Compulsory exercise 2: Group 18"
+author: "Thomas Rødland, Erlend Lokna"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   # html_document
   pdf_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, eval=TRUE,echo=FALSE, message=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
                       cache=TRUE, size="scriptsize",fig.width=4, fig.height=3,fig.align = "center")
 ```
 
 
-Includes:
 ```{r, eval=TRUE,echo=FALSE, message=FALSE}
 library("ggplot2")
 library("tidyverse")
@@ -100,8 +99,7 @@ set.seed(1)
 
 # load a synthetic dataset
 id <- "1CWZYfrLOrFdrIZ6Hv73e3xxt0SFgU4Ph"  # google file ID
-synthetic <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", 
-    id))
+synthetic <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
 
 # split into training and test sets
 train.ind = sample(1:nrow(synthetic), 0.8 * nrow(synthetic))
@@ -133,6 +131,24 @@ validationplot(pslr_model, val.type="MSEP", main="PSLR")
 
 We can clearly see that the PSLR method shrinks the MSEP quicker for fewer components when comparing to the PCR method. PCR is a unsupervised method while PSLR is supervised. 
 
-```{r}
 
+# Problem 3
+
+## a)
+1.
+2.
+3. False (the extra term makes it less wiggly not more smooth?)
+4. True (increase in k -> higher bias, lower variance ?)
+
+## b)
+using gam function to create a adaptive model:
+```{r, eval=TRUE}
+adpt_mod <- gam(medv ~rm  + s(ptratio, df=3) + s(lstat, df=2), data=boston.train)
 ```
+
+plotting results:
+```{r, eval=TRUE}
+par(mfrow=c(1,3)) #to partition the Plotting Window
+plot(adpt_mod, se=TRUE)
+```
+
