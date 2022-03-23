@@ -1,0 +1,140 @@
+---
+subtitle: "TMA4268 Statistical Learning V2022"
+title: "Compulsory exercise 1: Group XYZ (add your group number here)"
+author: "NN1, NN2 and NN3 (full names of all group members)"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  # html_document
+  pdf_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
+                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3,fig.align = "center")
+```
+
+
+Includes:
+```{r, eval=TRUE,echo=FALSE, message=FALSE}
+library("ggplot2")
+library("tidyverse")
+library("GGally")
+library("MASS")
+library("caret")
+library("glmnet")
+library("pls")
+library("gam")
+library("e1071")
+library("tree")
+library("randomForest")
+library("ggfortify")
+library("leaps")
+```
+
+```{r, eval=TRUE}
+set.seed(1)
+boston <- scale(Boston, center=T, scale=T)
+
+# split into training and rest sets
+train.ind = sample(1:nrow(boston), 0.8 * nrow(boston))
+boston.train = data.frame(boston[train.ind, ])
+boston.test = data.frame(boston[-train.ind, ])
+```
+
+# Problem 1
+
+## a)
+```{r, eval=TRUE}
+#forward subset selection:
+regfit_fwd.full = regsubsets(medv~., data = boston.train, nvmax=13, method = "forward")
+regfit_fwd.four = regsubsets(medv~., data = boston.train, nvmax=4, method = "forward")
+
+#plotting the R-squared vs number of predictors
+plot(summary(regfit_fwd.four)$rsq, xlab='No. of Variables',ylab='R^2',type='b')
+```
+
+## b)
+```{r, eval=TRUE}
+#the best four predictors:
+coef(regfit_fwd.four, 4)
+```
+## c)
+```{r, eval=TRUE}
+#K-fold cross-validation (k=5) 
+#setup:
+df.X.std <- scale(dplyr::select(Boston, -medv))       
+X.train <- as.matrix(df.X.std)[train.ind,] #converting to matrix. 
+X.test <- as.matrix(df.X.std)[-train.ind,]
+Y.train <- Boston[train.ind, "medv"]
+Y.train = as.matrix(Y.train)
+Y.test <- Boston[-train.ind, "medv"]
+Y.test = as.matrix(Y.test)
+
+#calculation using cv.glmnet():
+kf5_cv = cv.glmnet(x=X.train, y=Y.train, alpha = 1, nfolds = 5)
+```
+
+```{r, eval=TRUE}
+#plot:
+plot(kf5_cv)
+```
+Lambda corresponding to minimal Mean-Squared error:
+```{r, eval=TRUE}
+kf5_cv$lambda.min
+```
+coefficients:
+```{r, eval=TRUE}
+coef(kf5_cv, s=kf5_cv$lambda.min)
+```
+## d)
+1. True
+2. False
+3.
+4. True
+
+# Problem 2
+
+```{r, eval=TRUE}
+set.seed(1)
+
+# load a synthetic dataset
+id <- "1CWZYfrLOrFdrIZ6Hv73e3xxt0SFgU4Ph"  # google file ID
+synthetic <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", 
+    id))
+
+# split into training and test sets
+train.ind = sample(1:nrow(synthetic), 0.8 * nrow(synthetic))
+synthetic.train = data.frame(synthetic[train.ind, ])
+synthetic.test = data.frame(synthetic[-train.ind, ])
+
+# show head(..)  Y: response variable; X: predictor variable
+head(synthetic)
+```
+
+### a)
+
+Fitting PCR and PSLR on the synthetic.train data set:
+
+```{r, eval=TRUE}
+pcr_model <- pcr(Y~., data = synthetic.train, scale = TRUE, validation = "CV")
+pslr_model <- plsr(Y~., data=synthetic.train, scale = TRUE, validation = "CV")
+```
+
+```{r, eval=TRUE}
+validationplot(pcr_model, val.type="MSEP", main="PCR")
+```
+
+```{r, eval=TRUE}
+validationplot(pslr_model, val.type="MSEP", main="PSLR")
+```
+
+### b)
+
+We can clearly see that the PSLR method shrinks the MSEP quicker for fewer components when comparing to the PCR method. PCR is a unsupervised method while PSLR is supervised. 
+
+```{r}
+
+
+```
+
