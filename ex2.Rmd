@@ -134,7 +134,6 @@ validationplot(pslr_model, val.type="MSEP", main="PSLR")
 We can clearly see that the PSLR method shrinks the MSEP quicker for fewer components when comparing to the PCR method. PCR is a unsupervised method while PSLR is supervised. 
 
 ```{r}
-
-
+plot(1:10, 1:10 * 1:10)
 ```
 
