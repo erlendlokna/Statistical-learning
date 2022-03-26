@@ -161,6 +161,9 @@ plot(adpt_mod, se=TRUE)
 4. False
 
 ## b)
+
+See figure below:
+
 ```{r, echo=FALSE, out.width="50%", fig.cap="Sketch"}
 knitr::opts_chunk$set(fig.pos = "!H", out.extra = "")
 knitr::include_graphics("./recursive_three.drawio.png")
@@ -191,4 +194,33 @@ train <- Penguins_reduced[train_ind, ]
 test <- Penguins_reduced[-train_ind, ]
 ```
 
+#### i)
 
+```{r}
+penguins.tree <- tree(species ~ ., data=train, split = "gini")
+plot(penguins.tree, type="uniform")
+text(penguins.tree, pretty = 0)
+```
+
+#### ii)
+
+```{r}
+set.seed(123)
+cv.penguins <- cv.tree(penguins.tree, K = 10)
+plot(cv.penguins$dev ~ cv.penguins$size, type = "b", lwd = 2, col = "red", 
+    xlab = "Tree Size", ylab = "Deviance")
+```
+
+We see that the optimal tree contains 4 leaves. Creating the optimal tree with 4 leaves:
+
+#### iii)
+
+```{r}
+prune.penguins <- prune.tree(penguins.tree, best = 4)
+plot(prune.penguins, style="uniform", type = "proportional")
+text(prune.penguins, pretty=0)
+```
+
+## d)
+
+classification tree. 
