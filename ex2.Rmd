@@ -360,6 +360,8 @@ autoplot(pca_mat, data = happiness.X, colour = km.out$cluster, label = T, label.
 Using k = 3, we satisfy the condition. Usa is in a different cluster than the Scandinavian countries.
 
 ii)
+To answer this question we can sort the ladder scores and visualise the cluster results:
+
 ```{r}
 happiness.XY$countries <- rownames(happiness.XY) #addging country names in seperate coloumn. Makes the plot easier.
 
@@ -375,3 +377,4 @@ ggbarplot(happiness.XY, x = "countries", y = "Ladder.score",
           ) + theme(text = element_text(size = 2)) + theme(title = element_text(size = 10))
 ```
 
+The K-means algorithm clusters the countries that share similarities within all predictors for the happiness. As you see in the plot above the countries at the top of the ladder is clustered together. Based on the variables "social support", "freedom to make life choices" etc, the algorithm will cluster togheter countries that share these similarities, or in technical terms, reduces the variance.
