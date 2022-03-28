@@ -116,7 +116,7 @@ Fitting PCR and PSLR on the synthetic.train data set:
 
 ```{r, eval=TRUE}
 pcr_model <- pcr(Y~., data = synthetic.train, scale = TRUE, validation = "CV")
-pslr_model <- plsr(Y~., data=synthetic.train, scale = TRUE, validation = "CV")
+plsr_model <- plsr(Y~., data=synthetic.train, scale = TRUE, validation = "CV")
 ```
 
 ```{r, eval=TRUE}
@@ -124,7 +124,7 @@ validationplot(pcr_model, val.type="MSEP", main="PCR")
 ```
 
 ```{r, eval=TRUE}
-validationplot(pslr_model, val.type="MSEP", main="PSLR")
+validationplot(plsr_model, val.type="MSEP", main="PlSR")
 ```
 
 ### b)
@@ -206,6 +206,7 @@ text(penguins.tree, pretty = 0)
 
 ```{r}
 set.seed(123)
+#10 fold 
 cv.penguins <- cv.tree(penguins.tree, K = 10)
 plot(cv.penguins$dev ~ cv.penguins$size, type = "b", lwd = 2, col = "red", 
     xlab = "Tree Size", ylab = "Deviance")
@@ -223,4 +224,154 @@ text(prune.penguins, pretty=0)
 
 ## d)
 
-classification tree. 
+classification tree based on a more advanced method?
+
+
+# Problem 5
+
+## a)
+1. True?
+2. 
+3.
+4.
+
+
+# Problem 6
+
+```{r}
+# load a synthetic dataset
+id <- "1NJ1SuUBebl5P8rMSIwm_n3S8a7K43yP4" # google file ID
+happiness <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id),fileEncoding="UTF-8-BOM")
+
+cols = c('Country.name', 
+         'Ladder.score',  # happiness score
+         'Logged.GDP.per.capita',  
+         'Social.support', 
+         'Healthy.life.expectancy', 
+         'Freedom.to.make.life.choices',
+         'Generosity',  # how generous people are
+         'Perceptions.of.corruption')
+
+# We continue with a subset of 8 columns:
+happiness = subset(happiness, select = cols)
+rownames(happiness) <- happiness[, c(1)]
+
+# And we creat an X and a Y matrix
+happiness.X = happiness[, -c(1, 2)]
+happiness.Y = happiness[, c(1, 2)]
+happiness.XY = happiness[, -c(1)]
+
+# scale
+happiness.X = data.frame(scale(happiness.X))
+
+library(ggfortify)
+pca_mat = prcomp(happiness.X, center = T, scale = T)
+```
+
+```{r}
+# Score and loadings plot:
+autoplot(pca_mat, data = happiness.X, colour = "Black", loadings = TRUE, loadings.colour = "red", 
+    loadings.label = TRUE, loadings.label.size = 5, label = T, label.size = 1.5)
+```
+
+## a)
+i)
+First of all we observe that the "logged GDP", "social support", "healthy life expectancy" and "ladder score" practically have the same direction in the plot above. This implies a correlation, and we can assume that each one effects the other. We also observe that "freedom to make life choices" and "perception of corruption" is close to opposite in direction. This may be interpreted as countries having more freedom experience less corruption. Also there is a relation between corruption and generosity as the angle between the two directions are sufficient. The same can be said about the generosity and "logged GDP", "social support", "healthy life expectancy" and "ladder score".
+
+ii)
+
+
+## b)
+i)
+```{r}
+library(ggpubr)
+
+plotData <- data.frame(absPC1 = abs(data.frame(pca_mat$rotation)$PC1),
+                       variables = c(colnames(happiness.X)))
+
+ggbarplot(plotData, x = "variables", y = "absPC1",
+          main="sorted order [PCA]",
+          fill="#f1595f",
+          sort.val = "desc",
+          sort.by.groups = FALSE,
+          x.text.angle = 90,
+          orientation="horizontal"
+          )
+```
+
+ii)
+```{r}
+plsr_mat <- plsr(Ladder.score~., data = happiness.XY, scale=T)
+```
+
+iii)
+```{r}
+plotData$absPC1_PLSR <- abs(plsr_mat$loadings[,c('Comp 1')])
+
+ggbarplot(plotData, x = "variables", y = "absPC1_PLSR",
+          main="sorted order [PLSR]",
+          fill="#f1595f",
+          sort.val = "desc",
+          sort.by.groups = FALSE,
+          x.text.angle = 90,
+          orientation="horizontal"
+          )
+```
+```{r}
+
+plotData$difference <- abs(plotData$absPC1 - plotData$absPC1_PLSR)
+
+ggbarplot(plotData, x = "variables", y = "difference",
+          main="difference",
+          fill="#f1595f",
+          sort.val = "desc",
+          sort.by.groups = FALSE,
+          x.text.angle = 90,
+          orientation="horizontal"
+          )
+
+```
+
+
+iv)
+
+The three most important predictors are:
+
+1. Logged GDP per capita
+2. Healthy life expectancy
+3. Social support
+
+## c)
+1. False
+2. False (https://datascience.stackexchange.com/questions/63697/will-k-means-clustering-converge-to-the-same-results-given-the-same-data-set)
+3. 
+4. True
+
+## d)
+i)
+```{r}
+K = 3  # your choice
+km.out = kmeans(happiness.X, K)
+
+autoplot(pca_mat, data = happiness.X, colour = km.out$cluster, label = T, label.size = 2, 
+    loadings = F, loadings.colour = "blue",  loadings.label = F, loadings.label.size = 3)
+```
+
+Using k = 3, we satisfy the condition. Usa is in a different cluster than the Scandinavian countries.
+
+ii)
+```{r}
+happiness.XY$countries <- rownames(happiness.XY) #addging country names in seperate coloumn. Makes the plot easier.
+
+ggbarplot(happiness.XY, x = "countries", y = "Ladder.score",
+          main="Sorted ladder score",
+          fill= km.out$cluster,
+          color= km.out$cluster,
+          sort.val = "desc",
+          sort.by.groups = FALSE,
+          x.text.angle = 90,
+          x.text.size = 1,
+          ylab=FALSE
+          ) + theme(text = element_text(size = 2)) + theme(title = element_text(size = 10))
+```
+
