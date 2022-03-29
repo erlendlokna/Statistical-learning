@@ -46,17 +46,28 @@ boston.test = data.frame(boston[-train.ind, ])
 ## a)
 ```{r, eval=TRUE}
 #forward subset selection:
-regfit_fwd.full = regsubsets(medv~., data = boston.train, nvmax=13, method = "forward")
-regfit_fwd.four = regsubsets(medv~., data = boston.train, nvmax=4, method = "forward")
-
-#plotting the R-squared vs number of predictors
-plot(summary(regfit_fwd.four)$rsq, xlab='No. of Variables',ylab='R^2',type='b')
+regfit.fwd = regsubsets(medv~., data = boston.train, nvmax=4, method = "forward")
+regfit.bcwd = regsubsets(medv~., data = boston.train, nvmax=4, method = "backward")
 ```
+plotting the R-squared vs number of predictors for forward and backwards:
+```{r}
+#plotting the R-squared vs number of predictors
+plot(summary(regfit.fwd)$adjr2, xlab='No. of Variables',ylab='R^2',
+     main="forward",type='b', xlim=c(1,4))
+
+```
+
+```{r}
+plot(summary(regfit.bcwd)$adjr2, xlab='No. of Variables',ylab='R^2',
+     main="bacward",type='b', xlim=c(1,4))
+
+```
+
 
 ## b)
 ```{r, eval=TRUE}
 #the best four predictors:
-coef(regfit_fwd.four, 4)
+coef(regfit.fwd, 4)
 ```
 ## c)
 ```{r, eval=TRUE}
@@ -377,4 +388,4 @@ ggbarplot(happiness.XY, x = "countries", y = "Ladder.score",
           ) + theme(text = element_text(size = 2)) + theme(title = element_text(size = 10))
 ```
 
-The K-means algorithm clusters the countries that share similarities within all predictors for the happiness. As you see in the plot above the countries at the top of the ladder is clustered together. With K=3 the algorithm finds three classes of countries
+The K-means algorithm clusters the countries that share similarities within all predictors for the happiness ladder score. As you see in the plot above the countries at the top of the ladder is clustered together. With K=3 the algorithm finds three classes of countries
