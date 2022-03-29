@@ -60,7 +60,6 @@ plot(summary(regfit.fwd)$adjr2, xlab='No. of Variables',ylab='R^2',
 ```{r}
 plot(summary(regfit.bcwd)$adjr2, xlab='No. of Variables',ylab='R^2', ylim=c(0.54, 0.71),
      main="bacward",type='b', xlim=c(1,4))
-
 ```
 
 
@@ -73,6 +72,7 @@ coef(regfit.fwd, 4)
 ```{r, eval=TRUE}
 #K-fold cross-validation (k=5) 
 #setup:
+set.seed(123)
 df.X.std <- scale(dplyr::select(Boston, -medv))       
 X.train <- as.matrix(df.X.std)[train.ind,] #converting to matrix. 
 X.test <- as.matrix(df.X.std)[-train.ind,]
@@ -123,7 +123,7 @@ head(synthetic)
 
 ### a)
 
-Fitting PCR and PSLR on the synthetic.train data set:
+Fitting PCR and PLSR on the synthetic.train data set:
 
 ```{r, eval=TRUE}
 pcr_model <- pcr(Y~., data = synthetic.train, scale = TRUE, validation = "CV")
@@ -135,26 +135,36 @@ validationplot(pcr_model, val.type="MSEP", main="PCR")
 ```
 
 ```{r, eval=TRUE}
-validationplot(plsr_model, val.type="MSEP", main="PlSR")
+validationplot(plsr_model, val.type="MSEP", main="PLSR")
 ```
 
 ### b)
 
-We can clearly see that the PSLR method shrinks the MSEP quicker for fewer components when comparing to the PCR method. PCR is a unsupervised method while PSLR is supervised. 
+We can clearly see that the PSLR method shrinks the MSEP quicker for fewer components when comparing to the PCR method. PCR is a unsupervised method while PLSR is supervised. Meaning that for a data set with correlated values, the PLSR will perform better. 
 
+Plotting the correlation:
+
+```{r}
+library(corrplot)
+M = cor(synthetic.train)
+corrplot(M, method="color", main="correlation plot")
+```
+
+We see that there is a correlation between X2 and X3, as shown by the blue squares in the figure above. 
 
 # Problem 3
 
 ## a)
-1.
-2.
+1. True
+2. 
 3. False (the extra term makes it less wiggly not more smooth?)
 4. True (increase in k -> higher bias, lower variance ?)
 
 ## b)
-using gam function to create a adaptive model:
+
+using the gam-function to create an adaptive model:
 ```{r, eval=TRUE}
-adpt_mod <- gam(medv ~rm  + s(ptratio, df=3) + s(lstat, df=2), data=boston.train)
+adpt_mod <- gam(medv ~rm  + s(ptratio, df=3) + lo(lstat, degree=2, span=1), data=boston.train)
 ```
 
 plotting results:
@@ -219,9 +229,17 @@ text(penguins.tree, pretty = 0)
 set.seed(123)
 #10 fold 
 cv.penguins <- cv.tree(penguins.tree, K = 10)
+```
+
+```{r}
 plot(cv.penguins$dev ~ cv.penguins$size, type = "b", lwd = 2, col = "red", 
     xlab = "Tree Size", ylab = "Deviance")
 ```
+
+```{r}
+
+```
+
 
 We see that the optimal tree contains 4 leaves. Creating the optimal tree with 4 leaves:
 
@@ -290,7 +308,6 @@ i)
 First of all we observe that the "logged GDP", "social support", "healthy life expectancy" and "ladder score" practically have the same direction in the plot above. This implies a correlation, and we can assume that each one effects the other. We also observe that "freedom to make life choices" and "perception of corruption" is close to opposite in direction. This may be interpreted as countries having more freedom experience less corruption. Also there is a relation between corruption and generosity as the angle between the two directions are sufficient. The same can be said about the generosity and "logged GDP", "social support", "healthy life expectancy" and "ladder score".
 
 ii)
-
 
 ## b)
 i)
@@ -374,7 +391,7 @@ ii)
 To answer this question we can sort the ladder scores and visualise the cluster results:
 
 ```{r}
-happiness.XY$countries <- rownames(happiness.XY) #addging country names in seperate coloumn. Makes the plot easier.
+happiness.XY$countries <- rownames(happiness.XY) #adding country names in separate coloumn. Makes the plot easier.
 
 ggbarplot(happiness.XY, x = "countries", y = "Ladder.score",
           main="Sorted ladder score",
