@@ -53,12 +53,12 @@ plotting the R-squared vs number of predictors for forward and backwards:
 ```{r}
 #plotting the R-squared vs number of predictors
 plot(summary(regfit.fwd)$adjr2, xlab='No. of Variables',ylab='R^2',
-     main="forward",type='b', xlim=c(1,4))
+     main="forward",type='b', xlim=c(1,4), ylim=c(0.54, 0.71))
 
 ```
 
 ```{r}
-plot(summary(regfit.bcwd)$adjr2, xlab='No. of Variables',ylab='R^2',
+plot(summary(regfit.bcwd)$adjr2, xlab='No. of Variables',ylab='R^2', ylim=c(0.54, 0.71),
      main="bacward",type='b', xlim=c(1,4))
 
 ```
