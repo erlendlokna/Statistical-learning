@@ -405,4 +405,4 @@ ggbarplot(happiness.XY, x = "countries", y = "Ladder.score",
           ) + theme(text = element_text(size = 2)) + theme(title = element_text(size = 10))
 ```
 
-The K-means algorithm clusters the countries that share similarities within all predictors for the happiness ladder score. As you see in the plot above the countries at the top of the ladder is clustered together. With K=3 the algorithm finds three classes of countries
+The K-means algorithm clusters the countries that share similarities within all predictors for the happiness ladder score. As you see in the plot above the countries at the top of the ladder is clustered together. With K=3 the algorithm finds three classes of countries.
