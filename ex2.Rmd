@@ -305,7 +305,7 @@ autoplot(pca_mat, data = happiness.X, colour = "Black", loadings = TRUE, loading
 
 ## a)
 i)
-First of all we observe that the "logged GDP", "social support", "healthy life expectancy" and "ladder score" practically have the same direction in the plot above. This implies a correlation, and we can assume that each one effects the other. We also observe that "freedom to make life choices" and "perception of corruption" is close to opposite in direction. This may be interpreted as countries having more freedom experience less corruption. Also there is a relation between corruption and generosity as the angle between the two directions are sufficient. The same can be said about the generosity and "logged GDP", "social support", "healthy life expectancy" and "ladder score".
+First of all we observe that the "logged GDP", "social support", "healthy life expectancy" and "ladder score" practically have the same direction in the plot above. This implies a correlation, and we can assume that each one effects the other. We also observe that "freedom to make life choices" and "perception of corruption" is close to opposite in direction. This may be interpreted as countries having more freedom experience less corruption. Also there is no relation between corruption and generosity as the angle between the two directions are sufficient. The same can be said about the generosity and "logged GDP", "social support", "healthy life expectancy" and "ladder score".
 
 ii)
 
